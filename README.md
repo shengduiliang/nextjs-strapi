@@ -2,6 +2,8 @@
 
 一个开箱即用的 Headless CMS 全栈项目：**Next.js 16**（前端）+ **Strapi 5**（后端 CMS）+ **PostgreSQL 16**（数据库），全部通过 Docker Compose 编排。
 
+> 设计原则：**除 Docker 镜像本身外，所有数据与依赖都落在项目目录内**（绑定挂载），不使用 Docker 全局命名卷。
+
 ## 技术栈
 
 | 服务 | 技术 | 端口 |
@@ -14,15 +16,18 @@
 
 ```
 nextjs-strapi/
-├── docker-compose.yml    # 编排三个服务
+├── docker-compose.yml    # 编排三个服务（全部绑定挂载到项目内）
 ├── .env                  # 数据库凭据（已 gitignore）
 ├── .env.example          # 环境变量模板
+├── data/postgres/        # PostgreSQL 数据（运行时生成，已 gitignore）
 ├── backend/              # Strapi 后端
 │   ├── Dockerfile
+│   ├── node_modules/     # 依赖（安装生成，已 gitignore）
 │   ├── config/           # 服务/数据库/中间件等配置
 │   └── src/              # 内容类型、API 逻辑
 └── frontend/             # Next.js 前端
     ├── Dockerfile
+    ├── node_modules/     # 依赖（安装生成，已 gitignore）
     └── src/app/          # App Router 页面
 ```
 
@@ -34,20 +39,30 @@ nextjs-strapi/
 cp .env.example .env   # 已有 .env 可跳过，按需修改数据库密码
 ```
 
-### 2. 构建并启动
+### 2. 安装依赖（首次 / 全新克隆后）
+
+依赖安装在项目目录内（`backend/node_modules`、`frontend/node_modules`），通过容器执行以避免宿主机需要 Node：
+
+```bash
+docker run --rm -v "$PWD/backend":/opt/app -w /opt/app node:22-alpine npm install
+docker run --rm -v "$PWD/frontend":/app -w /app node:22-alpine npm install
+sudo chown -R $(id -u):$(id -g) backend/node_modules frontend/node_modules
+```
+
+### 3. 构建并启动
 
 ```bash
 docker compose up -d --build
 ```
 
-首次构建需下载依赖，耗时几分钟。启动完成后：
+首次启动需初始化数据库，稍候片刻。检查状态：
 
 ```bash
 docker compose ps
 # 三个服务均应为 running/healthy
 ```
 
-### 3. 访问
+### 4. 访问
 
 - **Strapi 管理后台**：http://localhost:1337/admin （首次访问会引导你创建管理员账号）
 - **Strapi API**：http://localhost:1337/api
@@ -94,32 +109,43 @@ export default async function Home() {
 ## 常用命令
 
 ```bash
-docker compose up -d          # 启动（后台）
-docker compose logs -f backend  # 查看 Strapi 日志
-docker compose logs -f frontend # 查看前端日志
-docker compose down           # 停止并删除容器（保留数据卷）
-docker compose down -v        # 停止并删除容器 + 数据卷（清空数据库/上传文件）
+docker compose up -d             # 启动（后台）
+docker compose logs -f backend   # 查看 Strapi 日志
+docker compose logs -f frontend  # 查看前端日志
+docker compose down              # 停止并删除容器
 ```
+
+> 数据在项目目录内（`data/postgres` 等），`docker compose down` 不会清空数据。如需彻底重置数据库，删除 `data/postgres` 后重新 `up`：
+> ```bash
+> docker compose down
+> sudo rm -rf data/postgres
+> mkdir -p data/postgres && sudo chown -R 70:70 data/postgres
+> docker compose up -d
+> ```
 
 ## 热重载与依赖变更
 
 源码已挂载到容器，修改 `backend/` 或 `frontend/` 下的代码会自动热重载。
 
-**重要**：如果修改了 `package.json`（增删依赖），需要重建镜像并刷新依赖卷：
+**重要**：如果修改了 `package.json`（增删依赖），需在项目目录内重新安装：
 
 ```bash
-docker compose build --no-cache backend   # 或 frontend
-docker compose up -d
-docker volume rm nextjs-strapi_backend_node_modules   # 必要时清空旧依赖卷
-docker compose up -d
+docker run --rm -v "$PWD/backend":/opt/app -w /opt/app node:22-alpine npm install
+sudo chown -R $(id -u):$(id -g) backend/node_modules
+# 或对 frontend 同样执行
 ```
 
-## 数据持久化
+## 数据持久化（全部在项目目录内）
 
-- `db_data`：PostgreSQL 数据
-- `backend_node_modules` / `frontend_node_modules`：容器内依赖
-- `frontend_next`：Next.js 构建缓存
-- Strapi 上传的媒体文件位于 `backend/public/uploads/`（宿主机可见）
+| 数据 | 位置 | 是否 gitignore |
+|------|------|----------------|
+| PostgreSQL 数据 | `data/postgres/` | ✅ |
+| 后端依赖 | `backend/node_modules/` | ✅ |
+| 前端依赖 | `frontend/node_modules/` | ✅ |
+| Next.js 构建缓存 | `frontend/.next/` | ✅ |
+| Strapi 上传媒体 | `backend/public/uploads/` | ✅ |
+
+> 仅 Docker 镜像（`nextjs-strapi-backend` / `nextjs-strapi-frontend` / `node` / `postgres`）存放在 Docker 自身的镜像存储中，这是 Docker 的机制，无法更改。
 
 ## 生产部署提示
 
