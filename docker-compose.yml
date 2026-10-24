@@ -1,0 +1,62 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: cms-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-strapi}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-strapi}
+      POSTGRES_DB: ${POSTGRES_DB:-strapi}
+    ports:
+      - "5432:5432"
+    # 数据库数据落在项目内 ./data/postgres（已 gitignore），不使用 Docker 全局卷
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-strapi} -d ${POSTGRES_DB:-strapi}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./backend
+    container_name: cms-backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      HOST: 0.0.0.0
+      PORT: 1337
+      DATABASE_CLIENT: postgres
+      DATABASE_HOST: db
+      DATABASE_PORT: 5432
+      DATABASE_NAME: ${POSTGRES_DB:-strapi}
+      DATABASE_USERNAME: ${POSTGRES_USER:-strapi}
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-strapi}
+      DATABASE_SSL: "false"
+    ports:
+      - "1337:1337"
+    # 源码与 node_modules 都来自项目内 backend/（依赖已安装在宿主项目目录）
+    volumes:
+      - ./backend:/opt/app
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: cms-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    environment:
+      NODE_ENV: development
+      # 浏览器端访问 Strapi 的地址（宿主机通过 localhost 访问）
+      NEXT_PUBLIC_STRAPI_URL: http://localhost:1337
+      # Next.js 服务端（容器内部）访问 Strapi 的地址
+      STRAPI_URL_INTERNAL: http://backend:1337
+    ports:
+      - "3000:3000"
+    # 源码与 node_modules 都来自项目内 frontend/
+    volumes:
+      - ./frontend:/app
