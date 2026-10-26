@@ -2,6 +2,7 @@ import { cache } from "react";
 import { unstable_cache } from "next/cache";
 
 import {
+  firstParagraphText,
   getAllNewsSlugs,
   getNewsArticle,
   newsArticles,
@@ -20,7 +21,7 @@ function staticToRecord(article: NewsArticle): NewsArticleRecord {
     slug: article.slug,
     title: article.title,
     date: article.date,
-    excerpt: article.blocks.find((b) => b.type === "paragraph")?.content.slice(0, 160) ?? "",
+    excerpt: firstParagraphText(article.blocks).slice(0, 160),
     blocks: article.blocks,
     nextSlug: article.nextSlug,
     status: "published",

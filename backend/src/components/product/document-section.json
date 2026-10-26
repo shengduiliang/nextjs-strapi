@@ -1,0 +1,19 @@
+{
+  "collectionName": "components_product_document_sections",
+  "info": {
+    "displayName": "文档分组",
+    "icon": "folder",
+    "description": "产品文档分组（数据手册/用户手册/勘误表）"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "rows": {
+      "type": "component",
+      "repeatable": true,
+      "component": "product.document-row"
+    }
+  }
+}

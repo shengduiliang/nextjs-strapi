@@ -1,0 +1,20 @@
+{
+  "collectionName": "components_product_tools",
+  "info": {
+    "displayName": "工具资源",
+    "icon": "wrench",
+    "description": "产品工具/资源链接"
+  },
+  "options": {},
+  "attributes": {
+    "label": {
+      "type": "string"
+    },
+    "note": {
+      "type": "string"
+    },
+    "href": {
+      "type": "string"
+    }
+  }
+}

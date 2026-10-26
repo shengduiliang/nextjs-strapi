@@ -16,7 +16,9 @@ function mapRow(row: ProductRow): ProductRecord {
     heroImage: String(row.heroImage ?? ""),
     blockDiagram: String(row.blockDiagram ?? ""),
     bannerImage: String(row.bannerImage ?? ""),
-    description: Array.isArray(row.description) ? row.description.map(String) : [],
+    description: Array.isArray(row.description)
+      ? row.description.map((p: any) => String(p?.text ?? ""))
+      : [],
     datasheets: Array.isArray(row.datasheets)
       ? (row.datasheets as ProductRecord["datasheets"])
       : [],
@@ -25,7 +27,7 @@ function mapRow(row: ProductRow): ProductRecord {
       : [],
     tools: Array.isArray(row.tools) ? (row.tools as ProductRecord["tools"]) : [],
     applications: Array.isArray(row.applications)
-      ? row.applications.map(String)
+      ? row.applications.map((a: any) => String(a?.text ?? ""))
       : [],
     publishStatus: String(row.publishStatus ?? "published"),
     categorySlug: String(row.categorySlug ?? ""),
@@ -37,7 +39,7 @@ function mapRow(row: ProductRow): ProductRecord {
 }
 
 export async function fetchPublishedProducts(): Promise<ProductRecord[]> {
-  const data = await strapiGet("/api/products?pagination[limit]=100");
+  const data = await strapiGet("/api/products?pagination[limit]=100&populate=*");
   const list =
     Array.isArray(data) && data.length > 0
       ? data.map(mapRow)
@@ -49,7 +51,7 @@ export async function fetchPublishedProductBySlug(
   slug: string
 ): Promise<ProductRecord | null> {
   const data = await strapiGet(
-    `/api/products?filters[slug][$eq]=${encodeURIComponent(slug)}`
+    `/api/products?filters[slug][$eq]=${encodeURIComponent(slug)}&populate=*`
   );
   if (Array.isArray(data) && data.length > 0) return mapRow(data[0] as ProductRow);
   return defaultProductCatalog.find((item) => item.slug === slug) ?? null;

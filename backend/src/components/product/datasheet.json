@@ -1,0 +1,23 @@
+{
+  "collectionName": "components_product_datasheets",
+  "info": {
+    "displayName": "数据手册",
+    "icon": "file",
+    "description": "产品数据手册条目"
+  },
+  "options": {},
+  "attributes": {
+    "label": {
+      "type": "string"
+    },
+    "lang": {
+      "type": "string"
+    },
+    "href": {
+      "type": "string"
+    },
+    "badge": {
+      "type": "string"
+    }
+  }
+}

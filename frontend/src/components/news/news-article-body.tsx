@@ -1,32 +1,20 @@
 import Image from "next/image";
 
-import type { NewsArticleBlock } from "@/lib/news-articles";
+import type { NewsArticleBlock, TextNode } from "@/lib/news-articles";
 
 type NewsArticleBodyProps = {
   blocks: NewsArticleBlock[];
 };
 
-const ALLOWED_TAGS = new Set(["strong", "b", "em", "i", "a", "br", "span"]);
-
-/** Minimal sanitizer for paragraph HTML produced by the admin editor. */
-function sanitizeInlineHtml(input: string) {
-  if (!input.includes("<")) return input;
-
-  return input
-    .replace(/<\/?([a-z0-9]+)(\s[^>]*)?>/gi, (match, tagName: string) => {
-      const tag = tagName.toLowerCase();
-      if (!ALLOWED_TAGS.has(tag)) return "";
-      if (tag === "br") return "<br />";
-      if (match.startsWith("</")) return `</${tag}>`;
-      if (tag === "a") {
-        const href = /href\s*=\s*("([^"]*)"|'([^']*)'|([^\s>]+))/i.exec(match);
-        const raw = href?.[2] ?? href?.[3] ?? href?.[4] ?? "";
-        if (!raw || raw.startsWith("javascript:")) return "<span>";
-        return `<a href="${raw.replaceAll('"', "")}" target="_blank" rel="noreferrer">`;
-      }
-      return `<${tag}>`;
-    })
-    .replace(/on\w+\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi, "");
+function renderInline(nodes: TextNode[]): React.ReactNode {
+  return nodes.map((node, i) => {
+    let el: React.ReactNode = node.text;
+    if (node.code) el = <code key={i}>{el}</code>;
+    if (node.bold) el = <strong key={i}>{el}</strong>;
+    if (node.italic) el = <em key={i}>{el}</em>;
+    if (node.underline) el = <u key={i}>{el}</u>;
+    return <span key={i}>{el}</span>;
+  });
 }
 
 export function NewsArticleBody({ blocks }: NewsArticleBodyProps) {
@@ -38,9 +26,10 @@ export function NewsArticleBody({ blocks }: NewsArticleBodyProps) {
             return (
               <p
                 key={index}
-                className="text-[16px] leading-[25px] text-[#333] [&_a]:text-[#0068b7] [&_a]:underline"
-                dangerouslySetInnerHTML={{ __html: sanitizeInlineHtml(block.content) }}
-              />
+                className="text-[16px] leading-[25px] text-[#333]"
+              >
+                {renderInline(block.children)}
+              </p>
             );
           case "heading":
             return (
@@ -48,7 +37,7 @@ export function NewsArticleBody({ blocks }: NewsArticleBodyProps) {
                 key={index}
                 className="pt-4 text-[24px] font-bold leading-9 text-[#0b254b]"
               >
-                {block.content}
+                {renderInline(block.children)}
               </h2>
             );
           case "image":
@@ -56,8 +45,8 @@ export function NewsArticleBody({ blocks }: NewsArticleBodyProps) {
               <figure key={index} className="flex justify-center py-3">
                 <div className="relative aspect-[800/450] w-full max-w-[800px]">
                   <Image
-                    src={block.src}
-                    alt={block.alt}
+                    src={block.image.url}
+                    alt={block.image.alternativeText ?? ""}
                     fill
                     className="object-cover"
                     sizes="(max-width: 912px) 100vw, 800px"
@@ -67,18 +56,26 @@ export function NewsArticleBody({ blocks }: NewsArticleBodyProps) {
             );
           case "list":
             return (
-              <ul key={index} className="list-disc space-y-1 pl-4">
-                {block.items.map((item) => (
-                  <li key={item} className="text-[16px] leading-[25px] text-[#333]">
-                    {item}
+              <ul
+                key={index}
+                className={`space-y-1 pl-4 ${
+                  block.format === "ordered" ? "list-decimal" : "list-disc"
+                }`}
+              >
+                {block.children.map((item, i) => (
+                  <li
+                    key={i}
+                    className="text-[16px] leading-[25px] text-[#333]"
+                  >
+                    {renderInline(item.children)}
                   </li>
                 ))}
               </ul>
             );
-          case "disclaimer":
+          case "quote":
             return (
               <p key={index} className="pt-2 text-[14px] leading-[14px] text-[#666]">
-                {block.content}
+                {renderInline(block.children)}
               </p>
             );
           default:

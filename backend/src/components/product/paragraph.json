@@ -1,0 +1,14 @@
+{
+  "collectionName": "components_product_paragraphs",
+  "info": {
+    "displayName": "描述段落",
+    "icon": "layer",
+    "description": "产品描述段落（一段一个）"
+  },
+  "options": {},
+  "attributes": {
+    "text": {
+      "type": "text"
+    }
+  }
+}

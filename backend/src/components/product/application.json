@@ -1,0 +1,14 @@
+{
+  "collectionName": "components_product_applications",
+  "info": {
+    "displayName": "应用场景",
+    "icon": "apps",
+    "description": "产品应用场景（一行一个）"
+  },
+  "options": {},
+  "attributes": {
+    "text": {
+      "type": "text"
+    }
+  }
+}

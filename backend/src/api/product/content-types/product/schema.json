@@ -39,19 +39,29 @@
       "type": "string"
     },
     "description": {
-      "type": "json"
+      "type": "component",
+      "repeatable": true,
+      "component": "product.paragraph"
     },
     "datasheets": {
-      "type": "json"
+      "type": "component",
+      "repeatable": true,
+      "component": "product.datasheet"
     },
     "documentSections": {
-      "type": "json"
+      "type": "component",
+      "repeatable": true,
+      "component": "product.document-section"
     },
     "tools": {
-      "type": "json"
+      "type": "component",
+      "repeatable": true,
+      "component": "product.tool"
     },
     "applications": {
-      "type": "json"
+      "type": "component",
+      "repeatable": true,
+      "component": "product.application"
     },
     "publishStatus": {
       "type": "string",

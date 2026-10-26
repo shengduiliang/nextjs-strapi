@@ -71,7 +71,7 @@ export async function fetchContactFromDb(): Promise<ContactContent | null> {
 }
 
 export async function fetchProductGs6933FromDb(): Promise<ProductContent | null> {
-  const data = await strapiGet("/api/products?filters[slug][$eq]=gs6933");
+  const data = await strapiGet("/api/products?filters[slug][$eq]=gs6933&populate=*");
   if (!Array.isArray(data) || data.length === 0) return null;
   const row = data[0] as Record<string, unknown>;
   if (!row.name) return null;
@@ -84,7 +84,7 @@ export async function fetchProductGs6933FromDb(): Promise<ProductContent | null>
     blockDiagram: String(row.blockDiagram ?? ""),
     bannerImage: String(row.bannerImage ?? ""),
     description: Array.isArray(row.description)
-      ? row.description.map(String)
+      ? row.description.map((p: any) => String(p?.text ?? ""))
       : defaultProductGs6933.description,
     datasheets: Array.isArray(row.datasheets)
       ? (row.datasheets as ProductContent["datasheets"])
@@ -96,7 +96,7 @@ export async function fetchProductGs6933FromDb(): Promise<ProductContent | null>
       ? (row.tools as ProductContent["tools"])
       : defaultProductGs6933.tools,
     applications: Array.isArray(row.applications)
-      ? row.applications.map(String)
+      ? row.applications.map((a: any) => String(a?.text ?? ""))
       : defaultProductGs6933.applications,
   };
 }

@@ -86,7 +86,7 @@ export const getHomepageNewsCards = cache(async (): Promise<HomepageNewsCard[]> 
     const imageBlock = article.blocks.find((block) => block.type === "image");
     const image =
       article.coverImage ||
-      (imageBlock && imageBlock.type === "image" ? imageBlock.src : null) ||
+      (imageBlock && imageBlock.type === "image" ? imageBlock.image?.url : null) ||
       newsItems[index % newsItems.length]?.image ||
       "/images/home/news-1.jpg";
 
@@ -111,7 +111,7 @@ export const getHomepageStoryCards = cache(async (): Promise<HomepageStoryCard[]
     const imageBlock = article.blocks.find((block) => block.type === "image");
     const image =
       article.coverImage ||
-      (imageBlock && imageBlock.type === "image" ? imageBlock.src : null) ||
+      (imageBlock && imageBlock.type === "image" ? imageBlock.image?.url : null) ||
       storyItems[index % storyItems.length]?.image ||
       "/images/home/story-1.jpg";
 

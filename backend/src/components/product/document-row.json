@@ -1,0 +1,26 @@
+{
+  "collectionName": "components_product_document_rows",
+  "info": {
+    "displayName": "文档行",
+    "icon": "file",
+    "description": "文档列表中的一行"
+  },
+  "options": {},
+  "attributes": {
+    "name": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string"
+    },
+    "date": {
+      "type": "string"
+    },
+    "cnHref": {
+      "type": "string"
+    },
+    "enHref": {
+      "type": "string"
+    }
+  }
+}

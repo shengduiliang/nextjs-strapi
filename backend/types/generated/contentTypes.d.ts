@@ -455,7 +455,7 @@ export interface ApiArticleArticle extends Struct.CollectionTypeSchema {
     draftAndPublish: false;
   };
   attributes: {
-    blocks: Schema.Attribute.JSON;
+    blocks: Schema.Attribute.Blocks;
     coverImage: Schema.Attribute.String;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -632,7 +632,7 @@ export interface ApiProductProduct extends Struct.CollectionTypeSchema {
     draftAndPublish: false;
   };
   attributes: {
-    applications: Schema.Attribute.JSON;
+    applications: Schema.Attribute.Component<'product.application', true>;
     bannerImage: Schema.Attribute.String;
     blockDiagram: Schema.Attribute.String;
     categorySlug: Schema.Attribute.String;
@@ -640,9 +640,12 @@ export interface ApiProductProduct extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    datasheets: Schema.Attribute.JSON;
-    description: Schema.Attribute.JSON;
-    documentSections: Schema.Attribute.JSON;
+    datasheets: Schema.Attribute.Component<'product.datasheet', true>;
+    description: Schema.Attribute.Component<'product.paragraph', true>;
+    documentSections: Schema.Attribute.Component<
+      'product.document-section',
+      true
+    >;
     groupId: Schema.Attribute.String;
     heroImage: Schema.Attribute.String;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
@@ -662,7 +665,7 @@ export interface ApiProductProduct extends Struct.CollectionTypeSchema {
       Schema.Attribute.Unique;
     sortOrder: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
     tagline: Schema.Attribute.String;
-    tools: Schema.Attribute.JSON;
+    tools: Schema.Attribute.Component<'product.tool', true>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
