@@ -109,7 +109,7 @@ export function SiteFooter() {
           </div>
         </div>
 
-        <div className="mt-8 grid gap-10 lg:grid-cols-[1fr_260px] lg:gap-12">
+        <div className="mt-8 grid gap-10 lg:grid-cols-[1fr_260px] lg:items-center lg:gap-12">
           <div className="space-y-8">
             <nav className="flex flex-wrap gap-6 text-lg sm:gap-16 xl:gap-20">
               {footerQuickLinks.map((link) => (
@@ -143,7 +143,7 @@ export function SiteFooter() {
               </Button>
             </form>
 
-            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
               {footerColumns.map((column) => (
                 <div key={column.title}>
                   <p className="mb-4 text-base text-white">
