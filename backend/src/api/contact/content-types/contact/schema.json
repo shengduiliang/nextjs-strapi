@@ -1,0 +1,33 @@
+{
+  "kind": "singleType",
+  "collectionName": "contacts",
+  "info": {
+    "singularName": "contact",
+    "pluralName": "contacts",
+    "displayName": "联系方式",
+    "description": "联系页面内容"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "company": {
+      "type": "string"
+    },
+    "address": {
+      "type": "text"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "formTitle": {
+      "type": "string"
+    },
+    "formIntro": {
+      "type": "text"
+    }
+  }
+}

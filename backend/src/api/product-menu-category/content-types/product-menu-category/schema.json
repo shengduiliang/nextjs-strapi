@@ -1,0 +1,37 @@
+{
+  "kind": "collectionType",
+  "collectionName": "product_menu_categories",
+  "info": {
+    "singularName": "product-menu-category",
+    "pluralName": "product-menu-categories",
+    "displayName": "产品菜单",
+    "description": "产品中心导航菜单"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "slug": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "label": {
+      "type": "string",
+      "required": true
+    },
+    "href": {
+      "type": "string"
+    },
+    "columns": {
+      "type": "json"
+    },
+    "featured": {
+      "type": "json"
+    },
+    "sortOrder": {
+      "type": "integer",
+      "default": 0
+    }
+  }
+}

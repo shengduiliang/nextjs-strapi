@@ -443,6 +443,232 @@ export interface AdminUser extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiArticleArticle extends Struct.CollectionTypeSchema {
+  collectionName: 'articles';
+  info: {
+    description: '\u516C\u53F8\u65B0\u95FB\u4E0E\u52A8\u6001';
+    displayName: '\u65B0\u95FB\u52A8\u6001';
+    pluralName: 'articles';
+    singularName: 'article';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    blocks: Schema.Attribute.JSON;
+    coverImage: Schema.Attribute.String;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    date: Schema.Attribute.Date;
+    excerpt: Schema.Attribute.Text;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::article.article'
+    > &
+      Schema.Attribute.Private;
+    nextSlug: Schema.Attribute.String;
+    publishedAt: Schema.Attribute.DateTime;
+    slug: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique;
+    status: Schema.Attribute.String & Schema.Attribute.DefaultTo<'published'>;
+    title: Schema.Attribute.String & Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiContactContact extends Struct.SingleTypeSchema {
+  collectionName: 'contacts';
+  info: {
+    description: '\u8054\u7CFB\u9875\u9762\u5185\u5BB9';
+    displayName: '\u8054\u7CFB\u65B9\u5F0F';
+    pluralName: 'contacts';
+    singularName: 'contact';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    address: Schema.Attribute.Text;
+    company: Schema.Attribute.String;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    email: Schema.Attribute.String;
+    formIntro: Schema.Attribute.Text;
+    formTitle: Schema.Attribute.String;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::contact.contact'
+    > &
+      Schema.Attribute.Private;
+    phone: Schema.Attribute.String;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiHomepageSlideHomepageSlide
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'homepage_slides';
+  info: {
+    description: '\u9996\u9875 Hero \u8F6E\u64AD\u56FE';
+    displayName: '\u9996\u9875\u8F6E\u64AD';
+    pluralName: 'homepage-slides';
+    singularName: 'homepage-slide';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    alt: Schema.Attribute.String;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    href: Schema.Attribute.String;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::homepage-slide.homepage-slide'
+    > &
+      Schema.Attribute.Private;
+    order: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
+    publishedAt: Schema.Attribute.DateTime;
+    src: Schema.Attribute.String & Schema.Attribute.Required;
+    subtitle: Schema.Attribute.String;
+    title: Schema.Attribute.String & Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiHotProductHotProduct extends Struct.CollectionTypeSchema {
+  collectionName: 'hot_products';
+  info: {
+    description: '\u9996\u9875\u70ED\u95E8\u4EA7\u54C1\u63A8\u8350';
+    displayName: '\u70ED\u95E8\u4EA7\u54C1';
+    pluralName: 'hot-products';
+    singularName: 'hot-product';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    description: Schema.Attribute.Text;
+    href: Schema.Attribute.String;
+    image: Schema.Attribute.String;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::hot-product.hot-product'
+    > &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String & Schema.Attribute.Required;
+    order: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiProductMenuCategoryProductMenuCategory
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'product_menu_categories';
+  info: {
+    description: '\u4EA7\u54C1\u4E2D\u5FC3\u5BFC\u822A\u83DC\u5355';
+    displayName: '\u4EA7\u54C1\u83DC\u5355';
+    pluralName: 'product-menu-categories';
+    singularName: 'product-menu-category';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    columns: Schema.Attribute.JSON;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    featured: Schema.Attribute.JSON;
+    href: Schema.Attribute.String;
+    label: Schema.Attribute.String & Schema.Attribute.Required;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::product-menu-category.product-menu-category'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    slug: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique;
+    sortOrder: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiProductProduct extends Struct.CollectionTypeSchema {
+  collectionName: 'products';
+  info: {
+    description: '\u4EA7\u54C1\u76EE\u5F55\uFF08\u542B GS6933 \u8BE6\u60C5\uFF09';
+    displayName: '\u4EA7\u54C1';
+    pluralName: 'products';
+    singularName: 'product';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    applications: Schema.Attribute.JSON;
+    bannerImage: Schema.Attribute.String;
+    blockDiagram: Schema.Attribute.String;
+    categorySlug: Schema.Attribute.String;
+    coverImage: Schema.Attribute.String;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    datasheets: Schema.Attribute.JSON;
+    description: Schema.Attribute.JSON;
+    documentSections: Schema.Attribute.JSON;
+    groupId: Schema.Attribute.String;
+    heroImage: Schema.Attribute.String;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::product.product'
+    > &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String & Schema.Attribute.Required;
+    productStatus: Schema.Attribute.String;
+    publishedAt: Schema.Attribute.DateTime;
+    publishStatus: Schema.Attribute.String &
+      Schema.Attribute.DefaultTo<'published'>;
+    sampleHref: Schema.Attribute.String;
+    slug: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique;
+    sortOrder: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
+    tagline: Schema.Attribute.String;
+    tools: Schema.Attribute.JSON;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface PluginContentReleasesRelease
   extends Struct.CollectionTypeSchema {
   collectionName: 'strapi_releases';
@@ -954,6 +1180,12 @@ declare module '@strapi/strapi' {
       'admin::transfer-token': AdminTransferToken;
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
+      'api::article.article': ApiArticleArticle;
+      'api::contact.contact': ApiContactContact;
+      'api::homepage-slide.homepage-slide': ApiHomepageSlideHomepageSlide;
+      'api::hot-product.hot-product': ApiHotProductHotProduct;
+      'api::product-menu-category.product-menu-category': ApiProductMenuCategoryProductMenuCategory;
+      'api::product.product': ApiProductProduct;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
       'plugin::i18n.locale': PluginI18NLocale;

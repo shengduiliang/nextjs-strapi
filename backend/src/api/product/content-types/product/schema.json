@@ -1,0 +1,74 @@
+{
+  "kind": "collectionType",
+  "collectionName": "products",
+  "info": {
+    "singularName": "product",
+    "pluralName": "products",
+    "displayName": "产品",
+    "description": "产品目录（含 GS6933 详情）"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "slug": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "tagline": {
+      "type": "string"
+    },
+    "productStatus": {
+      "type": "string"
+    },
+    "sampleHref": {
+      "type": "string"
+    },
+    "heroImage": {
+      "type": "string"
+    },
+    "blockDiagram": {
+      "type": "string"
+    },
+    "bannerImage": {
+      "type": "string"
+    },
+    "description": {
+      "type": "json"
+    },
+    "datasheets": {
+      "type": "json"
+    },
+    "documentSections": {
+      "type": "json"
+    },
+    "tools": {
+      "type": "json"
+    },
+    "applications": {
+      "type": "json"
+    },
+    "publishStatus": {
+      "type": "string",
+      "default": "published"
+    },
+    "categorySlug": {
+      "type": "string"
+    },
+    "groupId": {
+      "type": "string"
+    },
+    "coverImage": {
+      "type": "string"
+    },
+    "sortOrder": {
+      "type": "integer",
+      "default": 0
+    }
+  }
+}

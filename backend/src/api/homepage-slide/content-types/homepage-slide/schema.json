@@ -1,0 +1,36 @@
+{
+  "kind": "collectionType",
+  "collectionName": "homepage_slides",
+  "info": {
+    "singularName": "homepage-slide",
+    "pluralName": "homepage-slides",
+    "displayName": "首页轮播",
+    "description": "首页 Hero 轮播图"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "src": {
+      "type": "string",
+      "required": true
+    },
+    "alt": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "subtitle": {
+      "type": "string"
+    },
+    "href": {
+      "type": "string"
+    },
+    "order": {
+      "type": "integer",
+      "default": 0
+    }
+  }
+}

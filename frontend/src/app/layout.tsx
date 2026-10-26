@@ -1,25 +1,26 @@
 import type { Metadata } from "next";
-import type { ReactNode } from "react";
+
 import "./globals.css";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import { company } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: {
-    default: `${company.name} · ${company.nameEn}`,
-    template: `%s · ${company.name}`,
+  title: "深圳市荣芯半导体有限公司",
+  description:
+    "荣芯半导体 — 高性能人体健康传感器与 MCU 芯片，赋能智能可穿戴与主动健康监测",
+  icons: {
+    icon: "/favicon.png",
+    apple: "/apple-touch-icon.png",
   },
-  description: company.description,
 };
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   return (
-    <html lang="zh-CN">
-      <body className="flex min-h-screen flex-col bg-white text-slate-900 antialiased">
-        <Header />
-        <main className="flex-1">{children}</main>
-        <Footer />
+    <html lang="zh-CN" className="h-full antialiased">
+      <body className="flex min-h-full flex-col font-[family-name:var(--font-noto-sans-sc)]">
+        {children}
       </body>
     </html>
   );
