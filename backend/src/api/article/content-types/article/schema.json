@@ -27,7 +27,8 @@
       "type": "text"
     },
     "coverImage": {
-      "type": "string"
+      "type": "media",
+      "allowedTypes": ["images"]
     },
     "blocks": {
       "type": "blocks"

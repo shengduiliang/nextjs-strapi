@@ -22,10 +22,7 @@ function attachProductsToMenu(
     columns: category.columns.map((column) =>
       column.map((group): ProductMenuGroup => {
         const children = published
-          .filter(
-            (product) =>
-              product.categorySlug === category.id && product.groupId === group.id
-          )
+          .filter((product) => product.groupId === group.id)
           .map((product) => ({
             label: product.name,
             href: productDetailPath(product.slug),

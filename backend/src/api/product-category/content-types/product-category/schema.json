@@ -1,0 +1,38 @@
+{
+  "kind": "collectionType",
+  "collectionName": "product_categories",
+  "info": {
+    "singularName": "product-category",
+    "pluralName": "product-categories",
+    "displayName": "产品分类",
+    "description": "产品中心一级分类（如传感器/MCU）"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "slug": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "label": {
+      "type": "string",
+      "required": true
+    },
+    "href": {
+      "type": "string",
+      "default": "/products"
+    },
+    "sortOrder": {
+      "type": "integer",
+      "default": 0
+    },
+    "groups": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::product-group.product-group",
+      "mappedBy": "category"
+    }
+  }
+}

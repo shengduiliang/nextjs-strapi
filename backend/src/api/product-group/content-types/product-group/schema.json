@@ -1,0 +1,38 @@
+{
+  "kind": "collectionType",
+  "collectionName": "product_groups",
+  "info": {
+    "singularName": "product-group",
+    "pluralName": "product-groups",
+    "displayName": "产品分组",
+    "description": "产品中心二级分组（如健康传感器/温度传感器）"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "slug": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "label": {
+      "type": "string",
+      "required": true
+    },
+    "href": {
+      "type": "string",
+      "default": "/products"
+    },
+    "sortOrder": {
+      "type": "integer",
+      "default": 0
+    },
+    "category": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::product-category.product-category",
+      "inversedBy": "groups"
+    }
+  }
+}

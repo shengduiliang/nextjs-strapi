@@ -30,13 +30,16 @@
       "type": "string"
     },
     "heroImage": {
-      "type": "string"
+      "type": "media",
+      "allowedTypes": ["images"]
     },
     "blockDiagram": {
-      "type": "string"
+      "type": "media",
+      "allowedTypes": ["images"]
     },
     "bannerImage": {
-      "type": "string"
+      "type": "media",
+      "allowedTypes": ["images"]
     },
     "description": {
       "type": "component",
@@ -67,14 +70,14 @@
       "type": "string",
       "default": "published"
     },
-    "categorySlug": {
-      "type": "string"
-    },
-    "groupId": {
-      "type": "string"
+    "group": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::product-group.product-group"
     },
     "coverImage": {
-      "type": "string"
+      "type": "media",
+      "allowedTypes": ["images"]
     },
     "sortOrder": {
       "type": "integer",

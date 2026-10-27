@@ -19,7 +19,8 @@
       "type": "text"
     },
     "image": {
-      "type": "string"
+      "type": "media",
+      "allowedTypes": ["images"]
     },
     "href": {
       "type": "string"

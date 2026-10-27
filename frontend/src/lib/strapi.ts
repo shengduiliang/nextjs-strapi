@@ -16,3 +16,15 @@ export async function strapiGet(path: string): Promise<any> {
     return null;
   }
 }
+
+/**
+ * 提取媒体字段的 URL。兼容三种形态：
+ * - Strapi media 对象（{ url }）
+ * - 纯字符串（静态回退）
+ * - null/undefined → 空串
+ */
+export function mediaUrl(value: any): string {
+  if (!value) return "";
+  if (typeof value === "string") return value;
+  return typeof value.url === "string" ? value.url : "";
+}

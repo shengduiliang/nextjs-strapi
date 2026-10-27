@@ -456,7 +456,7 @@ export interface ApiArticleArticle extends Struct.CollectionTypeSchema {
   };
   attributes: {
     blocks: Schema.Attribute.Blocks;
-    coverImage: Schema.Attribute.String;
+    coverImage: Schema.Attribute.Media<'images'>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -541,7 +541,7 @@ export interface ApiHomepageSlideHomepageSlide
       Schema.Attribute.Private;
     order: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
     publishedAt: Schema.Attribute.DateTime;
-    src: Schema.Attribute.String & Schema.Attribute.Required;
+    src: Schema.Attribute.Media<'images'>;
     subtitle: Schema.Attribute.String;
     title: Schema.Attribute.String & Schema.Attribute.Required;
     updatedAt: Schema.Attribute.DateTime;
@@ -567,7 +567,7 @@ export interface ApiHotProductHotProduct extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     description: Schema.Attribute.Text;
     href: Schema.Attribute.String;
-    image: Schema.Attribute.String;
+    image: Schema.Attribute.Media<'images'>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -583,30 +583,71 @@ export interface ApiHotProductHotProduct extends Struct.CollectionTypeSchema {
   };
 }
 
-export interface ApiProductMenuCategoryProductMenuCategory
+export interface ApiProductCategoryProductCategory
   extends Struct.CollectionTypeSchema {
-  collectionName: 'product_menu_categories';
+  collectionName: 'product_categories';
   info: {
-    description: '\u4EA7\u54C1\u4E2D\u5FC3\u5BFC\u822A\u83DC\u5355';
-    displayName: '\u4EA7\u54C1\u83DC\u5355';
-    pluralName: 'product-menu-categories';
-    singularName: 'product-menu-category';
+    description: '\u4EA7\u54C1\u4E2D\u5FC3\u4E00\u7EA7\u5206\u7C7B\uFF08\u5982\u4F20\u611F\u5668/MCU\uFF09';
+    displayName: '\u4EA7\u54C1\u5206\u7C7B';
+    pluralName: 'product-categories';
+    singularName: 'product-category';
   };
   options: {
     draftAndPublish: false;
   };
   attributes: {
-    columns: Schema.Attribute.JSON;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    featured: Schema.Attribute.JSON;
-    href: Schema.Attribute.String;
+    groups: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::product-group.product-group'
+    >;
+    href: Schema.Attribute.String & Schema.Attribute.DefaultTo<'/products'>;
     label: Schema.Attribute.String & Schema.Attribute.Required;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
-      'api::product-menu-category.product-menu-category'
+      'api::product-category.product-category'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    slug: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique;
+    sortOrder: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiProductGroupProductGroup
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'product_groups';
+  info: {
+    description: '\u4EA7\u54C1\u4E2D\u5FC3\u4E8C\u7EA7\u5206\u7EC4\uFF08\u5982\u5065\u5EB7\u4F20\u611F\u5668/\u6E29\u5EA6\u4F20\u611F\u5668\uFF09';
+    displayName: '\u4EA7\u54C1\u5206\u7EC4';
+    pluralName: 'product-groups';
+    singularName: 'product-group';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    category: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::product-category.product-category'
+    >;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    href: Schema.Attribute.String & Schema.Attribute.DefaultTo<'/products'>;
+    label: Schema.Attribute.String & Schema.Attribute.Required;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::product-group.product-group'
     > &
       Schema.Attribute.Private;
     publishedAt: Schema.Attribute.DateTime;
@@ -633,10 +674,9 @@ export interface ApiProductProduct extends Struct.CollectionTypeSchema {
   };
   attributes: {
     applications: Schema.Attribute.Component<'product.application', true>;
-    bannerImage: Schema.Attribute.String;
-    blockDiagram: Schema.Attribute.String;
-    categorySlug: Schema.Attribute.String;
-    coverImage: Schema.Attribute.String;
+    bannerImage: Schema.Attribute.Media<'images'>;
+    blockDiagram: Schema.Attribute.Media<'images'>;
+    coverImage: Schema.Attribute.Media<'images'>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -646,8 +686,11 @@ export interface ApiProductProduct extends Struct.CollectionTypeSchema {
       'product.document-section',
       true
     >;
-    groupId: Schema.Attribute.String;
-    heroImage: Schema.Attribute.String;
+    group: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::product-group.product-group'
+    >;
+    heroImage: Schema.Attribute.Media<'images'>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -1187,7 +1230,8 @@ declare module '@strapi/strapi' {
       'api::contact.contact': ApiContactContact;
       'api::homepage-slide.homepage-slide': ApiHomepageSlideHomepageSlide;
       'api::hot-product.hot-product': ApiHotProductHotProduct;
-      'api::product-menu-category.product-menu-category': ApiProductMenuCategoryProductMenuCategory;
+      'api::product-category.product-category': ApiProductCategoryProductCategory;
+      'api::product-group.product-group': ApiProductGroupProductGroup;
       'api::product.product': ApiProductProduct;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;

@@ -1,4 +1,4 @@
-import { strapiGet } from "@/lib/strapi";
+import { mediaUrl, strapiGet } from "@/lib/strapi";
 
 import {
   defaultContactContent,
@@ -14,7 +14,7 @@ import type {
 } from "./types";
 
 type SlideRow = {
-  src?: string;
+  src?: unknown;
   alt?: string;
   title?: string;
   subtitle?: string;
@@ -24,16 +24,16 @@ type SlideRow = {
 type HotProductRow = {
   name?: string;
   description?: string;
-  image?: string;
+  image?: unknown;
   href?: string;
 };
 
 export async function fetchHomepageSlidesFromDb(): Promise<HomepageSlide[] | null> {
-  const data = await strapiGet("/api/homepage-slides?sort=order:asc&pagination[limit]=50");
+  const data = await strapiGet("/api/homepage-slides?sort=order:asc&pagination[limit]=50&populate=*");
   if (!Array.isArray(data) || data.length === 0) return null;
   return data
     .map((row: SlideRow) => ({
-      src: String(row.src ?? ""),
+      src: mediaUrl(row.src),
       alt: String(row.alt ?? row.title ?? ""),
       title: String(row.title ?? ""),
       subtitle: String(row.subtitle ?? ""),
@@ -43,13 +43,13 @@ export async function fetchHomepageSlidesFromDb(): Promise<HomepageSlide[] | nul
 }
 
 export async function fetchHotProductsFromDb(): Promise<HotProductItem[] | null> {
-  const data = await strapiGet("/api/hot-products?sort=order:asc&pagination[limit]=50");
+  const data = await strapiGet("/api/hot-products?sort=order:asc&pagination[limit]=50&populate=*");
   if (!Array.isArray(data) || data.length === 0) return null;
   return data
     .map((row: HotProductRow) => ({
       name: String(row.name ?? ""),
       description: String(row.description ?? ""),
-      image: String(row.image ?? "/images/home/product-gs6933.png"),
+      image: mediaUrl(row.image) || "/images/home/product-gs6933.png",
       href: String(row.href ?? "/products"),
     }))
     .filter((h) => h.name);
@@ -80,9 +80,9 @@ export async function fetchProductGs6933FromDb(): Promise<ProductContent | null>
     status: String(row.productStatus ?? ""),
     tagline: String(row.tagline ?? ""),
     sampleHref: String(row.sampleHref ?? "/about/contact"),
-    heroImage: String(row.heroImage ?? ""),
-    blockDiagram: String(row.blockDiagram ?? ""),
-    bannerImage: String(row.bannerImage ?? ""),
+    heroImage: mediaUrl(row.heroImage),
+    blockDiagram: mediaUrl(row.blockDiagram),
+    bannerImage: mediaUrl(row.bannerImage),
     description: Array.isArray(row.description)
       ? row.description.map((p: any) => String(p?.text ?? ""))
       : defaultProductGs6933.description,

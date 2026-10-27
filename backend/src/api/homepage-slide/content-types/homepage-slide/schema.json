@@ -12,8 +12,8 @@
   },
   "attributes": {
     "src": {
-      "type": "string",
-      "required": true
+      "type": "media",
+      "allowedTypes": ["images"]
     },
     "alt": {
       "type": "string"

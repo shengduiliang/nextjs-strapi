@@ -1,4 +1,4 @@
-import { strapiGet } from "@/lib/strapi";
+import { mediaUrl, strapiGet } from "@/lib/strapi";
 
 import { defaultProductCatalog } from "./default-catalog";
 import type { ProductRecord } from "./product-types";
@@ -6,6 +6,7 @@ import type { ProductRecord } from "./product-types";
 type ProductRow = Record<string, unknown>;
 
 function mapRow(row: ProductRow): ProductRecord {
+  const group = (row.group as Record<string, unknown> | null) ?? {};
   return {
     id: String(row.documentId ?? row.slug ?? ""),
     slug: String(row.slug ?? ""),
@@ -13,9 +14,9 @@ function mapRow(row: ProductRow): ProductRecord {
     status: String(row.productStatus ?? ""),
     tagline: String(row.tagline ?? ""),
     sampleHref: String(row.sampleHref ?? "/about/contact"),
-    heroImage: String(row.heroImage ?? ""),
-    blockDiagram: String(row.blockDiagram ?? ""),
-    bannerImage: String(row.bannerImage ?? ""),
+    heroImage: mediaUrl(row.heroImage),
+    blockDiagram: mediaUrl(row.blockDiagram),
+    bannerImage: mediaUrl(row.bannerImage),
     description: Array.isArray(row.description)
       ? row.description.map((p: any) => String(p?.text ?? ""))
       : [],
@@ -30,9 +31,9 @@ function mapRow(row: ProductRow): ProductRecord {
       ? row.applications.map((a: any) => String(a?.text ?? ""))
       : [],
     publishStatus: String(row.publishStatus ?? "published"),
-    categorySlug: String(row.categorySlug ?? ""),
-    groupId: String(row.groupId ?? ""),
-    coverImage: String(row.coverImage ?? ""),
+    categorySlug: "",
+    groupId: String(group.slug ?? ""),
+    coverImage: mediaUrl(row.coverImage),
     sortOrder: Number(row.sortOrder ?? 0),
     updatedAt: String(row.updatedAt ?? ""),
   };
