@@ -1,12 +1,32 @@
-# Next.js 16 开发环境镜像
-# 依赖（node_modules）与源码都位于项目内 frontend/，通过 bind mount 挂载进容器，
-# 不使用 Docker 全局卷。首次运行前需在项目目录内安装依赖：
-#   docker run --rm -v "$PWD/frontend":/app -w /app node:22-alpine npm install
-FROM node:22-alpine
-
+# Next.js 生产镜像：依赖与构建都在镜像内完成，compose up --build 即可
+FROM node:22-alpine AS deps
 WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci
 
+FROM node:22-alpine AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+# 构建期写入 rewrite 目标；运行时仍可由 STRAPI_URL_INTERNAL 覆盖服务端 fetch
+ARG STRAPI_URL_INTERNAL=http://backend:1337
+ENV STRAPI_URL_INTERNAL=$STRAPI_URL_INTERNAL
+ENV NEXT_TELEMETRY_DISABLED=1
+RUN npm run build
+
+FROM node:22-alpine AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV HOSTNAME=0.0.0.0
+ENV PORT=3000
+
+RUN addgroup -S nodejs && adduser -S nextjs -G nodejs
+
+COPY --from=builder /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+USER nextjs
 EXPOSE 3000
-
-# -H 0.0.0.0 确保在容器内监听所有网卡，宿主机才能访问
-CMD ["npm", "run", "dev", "--", "-H", "0.0.0.0"]
+CMD ["node", "server.js"]

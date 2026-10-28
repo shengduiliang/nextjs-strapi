@@ -1,5 +1,7 @@
 node_modules
 .next
 .env
-Dockerfile
-.dockerignore
+.env.*
+.git
+*.md
+AGENTS.md
