@@ -6,96 +6,69 @@
 
 | 服务 | 技术 | 端口 |
 |------|------|------|
-| `frontend` | Next.js 16 (React 19, Turbopack, Tailwind 4) | http://localhost:3000 |
+| `frontend` | Next.js 16 (React 19, Tailwind 4) | http://localhost:3000 |
 | `backend` | Strapi 5 (Node 22) | http://localhost:1337 |
 | `db` | PostgreSQL 16 | localhost:5432 |
 
-## 快速开始
+## 为什么云主机访问 /admin 会卡死？
 
-镜像里只做 `npm ci` 装依赖，然后直接跑开发服务（`next dev` / `strapi develop`），**不在服务器上做 production build**，小规格云主机也能跑。
+本机内存大，用 `strapi develop` 时**第一次打开 /admin 会现场编译管理后台**，几 GB 内存也能扛住。
+
+4G 云主机上若跑 develop，打开 /admin 等于当场编译，再加上 Postgres + Next，很容易把机器打挂。
+
+正确做法：**在本机编好生产镜像**（admin 已预编译），服务器只 `pull` / `load` 后运行 `strapi start`，访问 /admin 就很快、也很省内存。
+
+## 推荐部署（本机构建 → 服务器运行）
+
+### 1. 本机构建镜像
 
 ```bash
-cp .env.example .env
-# 编辑 .env：改数据库密码与各 Strapi 密钥
+# 方式 A：推到 Docker Hub
+docker login
+./scripts/build-and-push.sh
 
-mkdir -p data/postgres data/uploads
-
-# 建议：先加 2～4G swap，再构建（npm ci 也会占内存）
-# 分开构建更稳：
-docker compose build backend
-docker compose build frontend
-docker compose up -d
+# 方式 B：不推仓库，打包 scp
+./scripts/export-images.sh
+scp nextjs-strapi-images.tar.gz ubuntu@服务器IP:~/nextjs-strapi/
 ```
 
-查看状态：
+### 2. 服务器只启动（不要 --build）
 
 ```bash
-docker compose ps
-docker compose logs -f
+cd ~/nextjs-strapi
+git pull
+cp -n .env.example .env   # 配好 POSTGRES_* 与 Strapi 密钥
+mkdir -p data/postgres data/uploads
+
+# 若用方式 B：
+# gunzip -c nextjs-strapi-images.tar.gz | docker load
+
+docker compose pull        # 方式 A
+docker compose up -d       # 不要加 --build
 ```
 
 访问：
 
-- **官网**：http://服务器IP:3000
-- **Strapi 后台**：http://服务器IP:1337/admin（首次打开按提示创建管理员）
+- 官网：http://服务器IP:3000
+- Strapi：http://服务器IP:1337/admin
 
-停止：
+## 本机开发
 
 ```bash
-docker compose down   # 数据保留在 ./data/
+cp .env.example .env
+docker compose -f docker-compose.dev.yml up
 ```
-
-> 说明：`docker compose build` 仍会下载/安装 npm 依赖（只需一次，依赖打进镜像）。  
-> 这和 `next build` / `strapi build` 那种重编译不是一回事。若 2G 内存机器仍卡死，先加 swap，或临时升配编完再降回去。
 
 ## 目录结构
 
 ```
 nextjs-strapi/
-├── docker-compose.yml      # 生产编排（镜像内构建，无需宿主机装 Node）
-├── docker-compose.dev.yml  # 开发编排（热重载）
-├── .env / .env.example
-├── data/postgres/          # PostgreSQL 数据（gitignore）
-├── data/uploads/           # Strapi 上传媒体（gitignore）
-├── backend/                # Strapi
-└── frontend/               # Next.js
+├── docker-compose.yml       # 生产编排（用预构建镜像）
+├── docker-compose.dev.yml   # 开发热重载
+├── scripts/build-and-push.sh
+├── scripts/export-images.sh
+├── data/postgres/           # DB 数据
+├── data/uploads/            # 上传媒体
+├── backend/
+└── frontend/
 ```
-
-## 内容管理（Strapi 后台）
-
-| 内容类型 | 说明 |
-|---------|------|
-| 首页轮播 | 首页 Hero 轮播图 |
-| 热门产品 | 首页热门产品推荐 |
-| 产品 | 产品目录（含详情、手册、文档、工具等） |
-| 产品分类 / 产品分组 | 顶部「产品中心」菜单结构 |
-| 新闻动态 | 公司新闻 |
-| 联系方式 | 联系页公司信息（单类型） |
-
-后台改完后，官网约 60 秒内刷新（`revalidate: 60`）；Strapi 不可用时前端回退静态默认内容。
-
-## 常用命令
-
-```bash
-docker compose up -d --build   # 构建并后台启动
-docker compose logs -f         # 全部日志
-docker compose restart frontend
-docker compose down
-```
-
-重置数据库：
-
-```bash
-docker compose down
-sudo rm -rf data/postgres
-mkdir -p data/postgres data/uploads
-docker compose up -d --build
-```
-
-## 数据持久化
-
-| 数据 | 位置 |
-|------|------|
-| PostgreSQL | `data/postgres/` |
-| 上传媒体 | `data/uploads/` |
-| 应用代码与依赖 | Docker 镜像内（构建时打包） |
