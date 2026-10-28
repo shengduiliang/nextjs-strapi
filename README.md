@@ -10,24 +10,28 @@
 | `backend` | Strapi 5 (Node 22) | http://localhost:1337 |
 | `db` | PostgreSQL 16 | localhost:5432 |
 
-## 快速开始（服务器 / 生产）
+## 快速开始
 
-依赖与构建都在 Docker 镜像内完成，**克隆后直接**：
+镜像里只做 `npm ci` 装依赖，然后直接跑开发服务（`next dev` / `strapi develop`），**不在服务器上做 production build**，小规格云主机也能跑。
 
 ```bash
 cp .env.example .env
-# 编辑 .env：改数据库密码，并用 openssl rand -base64 16 生成各 Strapi 密钥
+# 编辑 .env：改数据库密码与各 Strapi 密钥
 
 mkdir -p data/postgres data/uploads
-docker compose up -d --build
+
+# 建议：先加 2～4G swap，再构建（npm ci 也会占内存）
+# 分开构建更稳：
+docker compose build backend
+docker compose build frontend
+docker compose up -d
 ```
 
 查看状态：
 
 ```bash
 docker compose ps
-docker compose logs -f frontend
-docker compose logs -f backend
+docker compose logs -f
 ```
 
 访问：
@@ -41,14 +45,8 @@ docker compose logs -f backend
 docker compose down   # 数据保留在 ./data/
 ```
 
-## 本地热重载开发（可选）
-
-```bash
-cp .env.example .env
-docker compose -f docker-compose.dev.yml up
-```
-
-开发编排会在容器启动时执行 `npm ci`，首次会稍慢；源码通过绑定挂载，改代码即可热更新。
+> 说明：`docker compose build` 仍会下载/安装 npm 依赖（只需一次，依赖打进镜像）。  
+> 这和 `next build` / `strapi build` 那种重编译不是一回事。若 2G 内存机器仍卡死，先加 swap，或临时升配编完再降回去。
 
 ## 目录结构
 

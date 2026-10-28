@@ -28,7 +28,6 @@ services:
     environment:
       HOST: 0.0.0.0
       PORT: 1337
-      NODE_ENV: production
       DATABASE_CLIENT: postgres
       DATABASE_HOST: db
       DATABASE_PORT: 5432
@@ -45,21 +44,17 @@ services:
     ports:
       - "1337:1337"
     volumes:
-      # 仅持久化上传媒体，源码与依赖都在镜像内
       - ./data/uploads:/opt/app/public/uploads
 
   frontend:
     build:
       context: ./frontend
-      args:
-        STRAPI_URL_INTERNAL: http://backend:1337
     container_name: cms-frontend
     restart: unless-stopped
     depends_on:
       - backend
     environment:
-      NODE_ENV: production
-      # Next.js 服务端（容器内部）访问 Strapi
       STRAPI_URL_INTERNAL: http://backend:1337
+      NEXT_TELEMETRY_DISABLED: "1"
     ports:
       - "3000:3000"
