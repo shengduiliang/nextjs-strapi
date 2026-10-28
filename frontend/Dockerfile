@@ -1,27 +1,29 @@
-# Next.js 生产镜像：依赖与构建都在镜像内完成，compose up --build 即可
-FROM node:22-alpine AS deps
+# Next.js 生产镜像（Debian slim，避免国内拉不通 Alpine 源）
+FROM node:22-bookworm-slim AS deps
 WORKDIR /app
+RUN npm config set registry https://registry.npmmirror.com
 COPY package.json package-lock.json ./
 RUN npm ci
 
-FROM node:22-alpine AS builder
+FROM node:22-bookworm-slim AS builder
 WORKDIR /app
+RUN npm config set registry https://registry.npmmirror.com
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-# 构建期写入 rewrite 目标；运行时仍可由 STRAPI_URL_INTERNAL 覆盖服务端 fetch
 ARG STRAPI_URL_INTERNAL=http://backend:1337
 ENV STRAPI_URL_INTERNAL=$STRAPI_URL_INTERNAL
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 
-FROM node:22-alpine AS runner
+FROM node:22-bookworm-slim AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV HOSTNAME=0.0.0.0
 ENV PORT=3000
 
-RUN addgroup -S nodejs && adduser -S nextjs -G nodejs
+RUN groupadd --system nodejs \
+  && useradd --system --uid 1001 --gid nodejs nextjs
 
 COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./

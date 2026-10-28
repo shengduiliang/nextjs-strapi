@@ -1,16 +1,21 @@
-# Strapi 生产镜像：依赖与构建都在镜像内完成，compose up --build 即可
-FROM node:22-alpine AS deps
+# Strapi 生产镜像（Debian slim，避免国内拉不通 Alpine 源）
+FROM node:22-bookworm-slim AS deps
 WORKDIR /opt/app
-RUN apk add --no-cache build-base gcc autoconf automake zlib-dev libpng-dev vips-dev git python3
+# 腾讯云等国内环境：换成 Debian / npm 国内镜像
+RUN sed -i 's/deb.debian.org/mirrors.cloud.tencent.com/g' /etc/apt/sources.list.d/debian.sources \
+  && sed -i 's/security.debian.org/mirrors.cloud.tencent.com/g' /etc/apt/sources.list.d/debian.sources \
+  && apt-get update \
+  && apt-get install -y --no-install-recommends python3 build-essential \
+  && rm -rf /var/lib/apt/lists/* \
+  && npm config set registry https://registry.npmmirror.com
 COPY package.json package-lock.json ./
 RUN npm ci
 
-FROM node:22-alpine AS builder
+FROM node:22-bookworm-slim AS builder
 WORKDIR /opt/app
-RUN apk add --no-cache vips-dev
+RUN npm config set registry https://registry.npmmirror.com
 COPY --from=deps /opt/app/node_modules ./node_modules
 COPY . .
-# 构建 admin 面板需要占位密钥（真正密钥由运行时环境变量注入）
 ENV NODE_ENV=production \
     APP_KEYS=buildKey1,buildKey2,buildKey3,buildKey4 \
     API_TOKEN_SALT=buildSalt \
@@ -20,10 +25,15 @@ ENV NODE_ENV=production \
     ENCRYPTION_KEY=buildEncryptionKey
 RUN npm run build
 
-FROM node:22-alpine AS runner
+FROM node:22-bookworm-slim AS runner
 WORKDIR /opt/app
-RUN apk add --no-cache vips-dev su-exec \
-  && addgroup -S strapi && adduser -S strapi -G strapi
+RUN sed -i 's/deb.debian.org/mirrors.cloud.tencent.com/g' /etc/apt/sources.list.d/debian.sources \
+  && sed -i 's/security.debian.org/mirrors.cloud.tencent.com/g' /etc/apt/sources.list.d/debian.sources \
+  && apt-get update \
+  && apt-get install -y --no-install-recommends ca-certificates \
+  && rm -rf /var/lib/apt/lists/* \
+  && groupadd --system strapi \
+  && useradd --system --gid strapi --create-home --home-dir /home/strapi strapi
 
 ENV NODE_ENV=production
 ENV HOST=0.0.0.0
