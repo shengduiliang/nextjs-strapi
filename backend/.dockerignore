@@ -9,3 +9,7 @@ build
 !.env.example
 .git
 *.md
+.strapi
+.strapi-updater.json
+dist
+types/generated

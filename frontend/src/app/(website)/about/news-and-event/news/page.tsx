@@ -34,7 +34,7 @@ export default async function NewsPage() {
               const imageBlock = article.blocks.find((block) => block.type === "image");
               const image =
                 imageBlock && imageBlock.type === "image"
-                  ? imageBlock.src
+                  ? imageBlock.image.url
                   : "/images/home/news-1.jpg";
               return (
                 <li key={article.slug}>

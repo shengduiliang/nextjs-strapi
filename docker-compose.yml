@@ -1,8 +1,3 @@
-# 服务器推荐用法：只 pull 预构建镜像并启动（不要在 4G 机器上 --build）
-#   docker compose pull && docker compose up -d
-#
-# 本机（内存充足）构建并推送：
-#   ./scripts/build-and-push.sh
 services:
   db:
     image: postgres:16-alpine
@@ -23,9 +18,7 @@ services:
       retries: 10
 
   backend:
-    image: ${DOCKER_IMAGE_PREFIX:-shengduiliang/nextjs-strapi}-backend:${IMAGE_TAG:-latest}
-    build:
-      context: ./backend
+    build: ./backend
     container_name: cms-backend
     restart: unless-stopped
     depends_on:
@@ -34,7 +27,6 @@ services:
     environment:
       HOST: 0.0.0.0
       PORT: 1337
-      NODE_ENV: production
       DATABASE_CLIENT: postgres
       DATABASE_HOST: db
       DATABASE_PORT: 5432
@@ -42,29 +34,24 @@ services:
       DATABASE_USERNAME: ${POSTGRES_USER:-strapi}
       DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-strapi}
       DATABASE_SSL: "false"
-      APP_KEYS: ${APP_KEYS:?set APP_KEYS in .env}
-      API_TOKEN_SALT: ${API_TOKEN_SALT:?set API_TOKEN_SALT in .env}
-      ADMIN_JWT_SECRET: ${ADMIN_JWT_SECRET:?set ADMIN_JWT_SECRET in .env}
-      TRANSFER_TOKEN_SALT: ${TRANSFER_TOKEN_SALT:?set TRANSFER_TOKEN_SALT in .env}
-      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env}
-      ENCRYPTION_KEY: ${ENCRYPTION_KEY:?set ENCRYPTION_KEY in .env}
+      APP_KEYS: ${APP_KEYS:-toBeModified1,toBeModified2}
+      API_TOKEN_SALT: ${API_TOKEN_SALT:-tobemodified}
+      ADMIN_JWT_SECRET: ${ADMIN_JWT_SECRET:-tobemodified}
+      TRANSFER_TOKEN_SALT: ${TRANSFER_TOKEN_SALT:-tobemodified}
+      JWT_SECRET: ${JWT_SECRET:-tobemodified}
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY:-tobemodified}
     ports:
       - "1337:1337"
     volumes:
       - ./data/uploads:/opt/app/public/uploads
 
   frontend:
-    image: ${DOCKER_IMAGE_PREFIX:-shengduiliang/nextjs-strapi}-frontend:${IMAGE_TAG:-latest}
-    build:
-      context: ./frontend
-      args:
-        STRAPI_URL_INTERNAL: http://backend:1337
+    build: ./frontend
     container_name: cms-frontend
     restart: unless-stopped
     depends_on:
       - backend
     environment:
-      NODE_ENV: production
       STRAPI_URL_INTERNAL: http://backend:1337
       NEXT_TELEMETRY_DISABLED: "1"
     ports:

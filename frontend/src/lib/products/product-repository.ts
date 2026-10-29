@@ -30,7 +30,7 @@ function mapRow(row: ProductRow): ProductRecord {
     applications: Array.isArray(row.applications)
       ? row.applications.map((a: any) => String(a?.text ?? ""))
       : [],
-    publishStatus: String(row.publishStatus ?? "published"),
+    publishStatus: row.publishStatus === "draft" ? "draft" : "published",
     categorySlug: "",
     groupId: String(group.slug ?? ""),
     coverImage: mediaUrl(row.coverImage),
