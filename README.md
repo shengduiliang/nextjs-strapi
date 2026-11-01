@@ -1,8 +1,6 @@
 # 荣芯半导体官网（Next.js + Strapi + PostgreSQL）
 
-本地和服务器同一套 Docker Compose，装依赖在镜像里完成。
-
-## 启动
+## 本地开发
 
 ```bash
 cp .env.example .env
@@ -10,17 +8,43 @@ mkdir -p data/postgres data/uploads
 docker compose up -d --build
 ```
 
-## 访问
-
 - 官网：http://localhost:3000
 - Strapi：http://localhost:1337/admin
+
+## 腾讯云 4G 机器（不要在服务器上 --build）
+
+`docker compose up --build` 会把 4G 机器打挂。请在本机编好镜像再上传：
+
+**本机：**
+
+```bash
+# 若还没有生产镜像，先构建（需 8G+ 内存）
+docker compose build
+
+# 打包
+docker save nextjs-strapi-backend:latest nextjs-strapi-frontend:latest | gzip > nextjs-strapi-images.tar.gz
+scp nextjs-strapi-images.tar.gz ubuntu@服务器IP:~/nextjs-strapi/
+```
+
+**服务器（控制台重启救活后）：**
+
+```bash
+cd ~/nextjs-strapi
+git pull
+cp -n .env.example .env   # 配好密钥
+
+# 加 swap
+sudo fallocate -l 2G /swapfile && sudo chmod 600 /swapfile
+sudo mkswap /swapfile && sudo swapon /swapfile
+
+gunzip -c nextjs-strapi-images.tar.gz | docker load
+docker compose down
+docker compose up -d      # 不要加 --build
+```
 
 ## 常用命令
 
 ```bash
-docker compose logs -f          # 看日志
-docker compose down             # 停止（数据保留在 ./data/）
-docker compose up -d --build    # 改代码或依赖后重建启动
+docker compose logs -f
+docker compose down
 ```
-
-> 小内存云主机若首次打开 `/admin` 很卡，先加 2G swap，或等几分钟让 Strapi 编译完管理后台。
